@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"os"
 
 	da "github.com/kechako/go-yahoo-da"
+	"github.com/kechako/mktree/node"
 	"github.com/pkg/errors"
 )
 
@@ -34,18 +36,30 @@ func run() (int, error) {
 		return 1, errors.Wrap(err, "Could not parse the text")
 	}
 
+	depMap := make(map[int][]da.Chunk)
 	for _, chunk := range res.Results[0].Chunks {
-		fmt.Printf("ID : %d => %d\n", chunk.ID, chunk.Dependency)
-		for _, m := range chunk.Morphemes {
-			fmt.Printf("  %s\n", m.Surface)
-			fmt.Printf("    %s\n", m.Reading)
-			fmt.Printf("    %s\n", m.Baseform)
-			fmt.Printf("    %s\n", m.POS)
-			fmt.Printf("    %s\n", m.Feature)
-		}
+		depMap[chunk.Dependency] = append(depMap[chunk.Dependency], chunk)
 	}
 
+	root := makeNode(depMap[-1][0], depMap, 0)
+
+	buf := bufio.NewWriter(os.Stdout)
+	defer buf.Flush()
+
+	root.Print(buf)
+
 	return 0, nil
+}
+
+func makeNode(chunk da.Chunk, depMap map[int][]da.Chunk, indent int) *node.Node {
+	n := node.NewIndent(chunk.String(), indent)
+
+	for _, dep := range depMap[chunk.ID] {
+		child := makeNode(dep, depMap, indent+1)
+		n.Add(child)
+	}
+
+	return n
 }
 
 func main() {
