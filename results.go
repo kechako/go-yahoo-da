@@ -23,6 +23,15 @@ type Chunk struct {
 	Morphemes  []Morpheme `xml:"MorphemList>Morphem"`
 }
 
+// String returns a string of chunk.
+func (c Chunk) String() string {
+	s := ""
+	for _, m := range c.Morphemes {
+		s += m.Surface
+	}
+	return s
+}
+
 // A Morpheme represents information of a Morpheme.
 type Morpheme struct {
 	Surface  string `xml:"Surface"`
