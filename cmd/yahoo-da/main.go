@@ -18,6 +18,11 @@ func init() {
 	flag.StringVar(&appID, "appid", os.Getenv("YAHOO_APP_ID"), "Yahoo! Application ID.")
 }
 
+func printHelp() {
+	flag.Usage()
+	flag.PrintDefaults()
+}
+
 func run() (int, error) {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s text\n\n", os.Args[0])
@@ -25,8 +30,13 @@ func run() (int, error) {
 	flag.Parse()
 
 	if flag.NArg() != 1 {
-		flag.Usage()
-		flag.PrintDefaults()
+		printHelp()
+		return 2, nil
+	}
+
+	if appID == "" {
+		fmt.Fprint(os.Stderr, "Yahoo! Application ID is not specified.\n\n")
+		printHelp()
 		return 2, nil
 	}
 
