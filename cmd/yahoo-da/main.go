@@ -9,7 +9,7 @@ import (
 
 	da "github.com/kechako/go-yahoo-da"
 	"github.com/kechako/mktree/node"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 var appID string
@@ -43,7 +43,7 @@ func run() (int, error) {
 	client := da.NewClient(appID)
 	res, err := client.Parse(context.Background(), flag.Arg(0))
 	if err != nil {
-		return 1, errors.Wrap(err, "Could not parse the text")
+		return 1, xerrors.Errorf("could not parse the text: %w", err)
 	}
 
 	depMap := make(map[int][]da.Chunk)
