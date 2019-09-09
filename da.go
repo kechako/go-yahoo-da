@@ -2,10 +2,9 @@ package da
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
-
-	"golang.org/x/xerrors"
 )
 
 // APIEndpoint is a endpoint url of an API for japanese dependency parsing.
@@ -42,7 +41,7 @@ func (c *Client) Parse(ctx context.Context, text string) (ResultSet, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return result, xerrors.Errorf("Got http status %s", res.Status)
+		return result, fmt.Errorf("Got http status %s", res.Status)
 	}
 
 	result, err = decodeResultSet(res.Body)
